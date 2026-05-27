@@ -1,0 +1,8 @@
+CLAUDE.md
+.env
+*.pdf
+*.png
+*.jpg
+.tmp/
+token.json
+credentials.json

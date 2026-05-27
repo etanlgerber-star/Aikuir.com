@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aikuir — Intelligent Legal Operations for Workers' Compensation Attorneys</title>
+  <meta name="description" content="Aikuir replaces fragmented legal tech with one AI-powered platform built exclusively for workers' compensation attorneys. Automate records, drafting, and marketing on a secure local server." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── DESIGN TOKENS ─────────────────────────────────── */
+    :root {
+      --ais-blue:         #2CA9E1;
+      --ais-dark-blue:    #143C5A;
+      --ais-medium-blue:  #4A90C0;
+      --ais-teal:         #2D9BA8;
+      --ais-orange:       #F39237;
+      --ais-white:        #F0F2F5;
+      --ais-white-pure:   #FFFFFF;
+      --ais-grey-light:   #C5C8CC;
+      --ais-grey:         #8A8F98;
+      --ais-dark-grey:    #2A2D33;
+      --ais-dark:         #0A0C10;
+      --ais-darker:       #060810;
+
+      --ais-blue-dim:     rgba(44,169,225,.6);
+
+      --bg-page:     var(--ais-darker);
+      --bg-base:     var(--ais-dark);
+      --bg-surface:  rgba(12,15,24,.95);
+      --bg-card:     rgba(16,20,32,.65);
+      --bg-glass:    rgba(44,169,225,.04);
+      --bg-elevated: rgba(22,27,44,.8);
+
+      --fg-strong:  var(--ais-white-pure);
+      --fg:         var(--ais-white);
+      --fg-muted:   var(--ais-grey-light);
+      --fg-subtle:  var(--ais-grey);
+      --fg-accent:  var(--ais-blue);
+      --fg-warm:    var(--ais-teal);
+
+      --border:          rgba(44,169,225,.1);
+      --border-hover:    rgba(44,169,225,.3);
+      --border-strong:   rgba(44,169,225,.45);
+      --border-strongest:rgba(44,169,225,.7);
+      --border-teal:     rgba(45,155,168,.3);
+      --border-teal-strong: rgba(45,155,168,.5);
+
+      --grad-cool:     linear-gradient(135deg, var(--ais-blue) 0%, var(--ais-teal) 100%);
+      --grad-teal:     linear-gradient(135deg, var(--ais-teal) 0%, var(--ais-medium-blue) 100%);
+      --grad-hairline: linear-gradient(90deg, transparent 0%, var(--border) 20%, var(--border-hover) 50%, var(--border) 80%, transparent 100%);
+
+      --glow-blue:        0 0 80px rgba(44,169,225,.15), 0 0 160px rgba(44,169,225,.05);
+      --glow-blue-intense:0 0 40px rgba(44,169,225,.3),  0 0 120px rgba(44,169,225,.1);
+      --glow-teal:        0 0 60px rgba(45,155,168,.25), 0 0 120px rgba(45,155,168,.08);
+      --glow-logo:        0 0 50px rgba(44,169,225,.75);
+
+      --shadow-sm: 0 2px 8px  rgba(0,0,0,.25);
+      --shadow-md: 0 4px 24px rgba(0,0,0,.35);
+      --shadow-lg: 0 12px 48px rgba(0,0,0,.45);
+
+      --font-mono: "Roboto Mono", ui-monospace, monospace;
+      --font-sans: "Montserrat", system-ui, sans-serif;
+
+      --text-xs:   .75rem;
+      --text-sm:   .875rem;
+      --text-base: 1rem;
+      --text-lg:   1.125rem;
+      --text-xl:   1.25rem;
+      --text-2xl:  1.5rem;
+      --text-3xl:  1.875rem;
+      --text-4xl:  2.25rem;
+      --text-5xl:  3rem;
+      --text-6xl:  3.75rem;
+
+      --sp-1: .25rem; --sp-2: .5rem;  --sp-3: .75rem;  --sp-4: 1rem;
+      --sp-5: 1.25rem;--sp-6: 1.5rem; --sp-8: 2rem;    --sp-10: 2.5rem;
+      --sp-12: 3rem;  --sp-16: 4rem;  --sp-20: 5rem;   --sp-24: 6rem;
+
+      --radius-sm: 6px;
+      --radius:    10px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+
+      --container-padding: var(--sp-4);
+    }
+    @media (min-width: 768px) { :root { --container-padding: var(--sp-8); } }
+
+    /* ── RESET ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    html, body { overflow-x: hidden; }
+    body {
+      font-family: var(--font-sans);
+      font-weight: 400;
+      font-size: var(--text-base);
+      line-height: 1.6;
+      color: var(--fg);
+      background: var(--bg-page);
+      -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: rgba(44,169,225,.3); color: var(--fg-strong); }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+
+    /* ── UTILITIES ─────────────────────────────────────── */
+    .container {
+      width: 100%;
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 var(--container-padding);
+    }
+    .hairline {
+      height: 1px;
+      background: var(--grad-hairline);
+      border: none;
+      margin: 0;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 500;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--fg-accent);
+      background: var(--bg-glass);
+      border: 1px solid var(--border);
+      padding: var(--sp-2) var(--sp-3);
+      border-radius: 100px;
+    }
+    .badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--ais-blue);
+      box-shadow: 0 0 6px var(--ais-blue);
+    }
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 500;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--fg-accent);
+      margin-bottom: var(--sp-3);
+    }
+    .section-title {
+      font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl));
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -.025em;
+      color: var(--fg-strong);
+    }
+    .section-title .accent { color: var(--ais-blue); }
+    .section-title .warm   { color: var(--ais-teal); }
+    .section-sub {
+      font-size: var(--text-lg);
+      color: var(--fg-muted);
+      line-height: 1.72;
+      max-width: 580px;
+      margin-top: var(--sp-4);
+    }
+
+    /* ── BUTTONS ───────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: var(--text-sm);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      padding: var(--sp-3) var(--sp-6);
+      border-radius: var(--radius-sm);
+      border: none;
+      cursor: pointer;
+      transition: all .2s ease;
+      white-space: nowrap;
+    }
+    .btn-orange {
+      background: var(--grad-cool);
+      color: #fff;
+      box-shadow: var(--glow-blue), var(--shadow-md);
+      position: relative;
+      overflow: visible;
+    }
+    .btn-orange:hover { transform: translateY(-2px); box-shadow: var(--glow-blue-intense), var(--shadow-lg); }
+    .btn-neon::before,
+    .btn-neon::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      width: 75%;
+      height: 1px;
+      margin: 0 auto;
+      background: linear-gradient(to right, transparent, rgba(255,255,255,.9), transparent);
+      transition: opacity .5s ease-in-out;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .btn-neon::before { top: 0;    opacity: 0; }
+    .btn-neon::after  { bottom: -1px; opacity: 1; }
+    .btn-neon:hover::before { opacity: 1; }
+    .btn-neon:hover::after  { opacity: .3; }
+    .btn-blue {
+      background: transparent;
+      color: var(--fg-accent);
+      border: 1px solid var(--border-strong);
+    }
+    .btn-blue:hover { background: var(--bg-glass); border-color: var(--border-strongest); color: var(--fg-strong); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--fg-muted);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { border-color: var(--border-hover); color: var(--fg); }
+
+    /* ── CARDS ─────────────────────────────────────────── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--sp-8);
+      backdrop-filter: blur(12px);
+      transition: border-color .25s, box-shadow .25s, transform .25s;
+    }
+    .card:hover {
+      border-color: var(--border-hover);
+      box-shadow: var(--glow-blue), var(--shadow-md);
+      transform: translateY(-3px);
+    }
+    .card-icon {
+      width: 44px; height: 44px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-glass);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: var(--sp-5);
+    }
+    .card-icon svg { width: 22px; height: 22px; stroke: var(--ais-blue); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .card h3 { font-size: var(--text-lg); font-weight: 700; color: var(--fg-strong); margin-bottom: var(--sp-3); }
+    .card p  { font-size: var(--text-sm); color: var(--fg-muted); line-height: 1.7; }
+
+    /* ── NAV ───────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0; z-index: 100;
+      background: rgba(6,8,16,.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 68px;
+    }
+    .nav-logo img { height: 34px; width: auto; }
+    .nav-links { display: flex; align-items: center; gap: var(--sp-8); list-style: none; }
+    .nav-links a { font-size: var(--text-sm); font-weight: 500; color: var(--fg-subtle); letter-spacing: .03em; transition: color .2s; }
+    .nav-links a:hover { color: var(--fg-accent); }
+    .nav-cta { display: flex; align-items: center; gap: var(--sp-3); }
+
+    /* ── HERO ──────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      padding: var(--sp-24) 0 calc(var(--sp-24) + var(--sp-8));
+      text-align: center;
+      overflow: hidden;
+    }
+    .hero-glow {
+      position: absolute;
+      top: -120px; left: 50%;
+      transform: translateX(-50%);
+      width: 900px; height: 500px;
+      background: radial-gradient(ellipse at center, rgba(44,169,225,.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-eyebrow { margin-bottom: var(--sp-6); position: relative; }
+    .hero h1 {
+      font-size: clamp(2.2rem, 4.5vw, 4rem);
+      font-weight: 900;
+      line-height: 1.12;
+      letter-spacing: -.03em;
+      color: var(--fg-strong);
+      margin-bottom: var(--sp-6);
+      position: relative;
+    }
+    .hero h1 .line-accent {
+      display: block;
+      background: linear-gradient(90deg, var(--ais-blue) 0%, var(--ais-teal) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+      filter: drop-shadow(0 0 30px rgba(44,169,225,.4));
+    }
+    .hero-sub {
+      font-size: clamp(var(--text-base), 2vw, var(--text-xl));
+      color: var(--fg-muted);
+      max-width: 600px;
+      margin: 0 auto var(--sp-10);
+      line-height: 1.72;
+      position: relative;
+    }
+    .hero-cta {
+      display: flex; gap: var(--sp-4); justify-content: center;
+      flex-wrap: wrap; margin-bottom: var(--sp-16); position: relative;
+    }
+    .hero-stats {
+      position: relative;
+      display: flex; justify-content: center; flex-wrap: wrap;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      max-width: 860px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .hero-stat {
+      flex: 1; min-width: 160px;
+      padding: var(--sp-6) var(--sp-8);
+      border-right: 1px solid var(--border);
+      text-align: center;
+    }
+    .hero-stat:last-child { border-right: none; }
+    .hero-stat strong {
+      display: block;
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      font-weight: 900;
+      letter-spacing: -.04em;
+      color: var(--ais-blue);
+      line-height: 1;
+      margin-bottom: var(--sp-2);
+      text-shadow: 0 0 20px rgba(44,169,225,.4);
+    }
+    .hero-stat strong.warm { color: var(--ais-teal); text-shadow: 0 0 20px rgba(45,155,168,.5); }
+    .hero-stat span { font-size: var(--text-xs); color: var(--fg-subtle); text-transform: uppercase; letter-spacing: .1em; font-weight: 500; font-family: var(--font-mono); }
+
+    /* ── PROBLEM ───────────────────────────────────────── */
+    .section { padding: var(--sp-24) 0; }
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--sp-5);
+      margin-top: var(--sp-12);
+    }
+
+    /* ── FEATURES OVERVIEW ─────────────────────────────── */
+    .features-overview { background: var(--bg-base); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .feat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: var(--sp-5);
+      margin-top: var(--sp-12);
+    }
+
+    /* ── DEEP FEATURE BLOCKS ───────────────────────────── */
+    .feature-block {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-16);
+      align-items: center;
+      margin-bottom: var(--sp-24);
+    }
+    .feature-block:last-child { margin-bottom: 0; }
+    .feature-block.reverse .feature-ui { order: -1; }
+    .feat-tag {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 500;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--fg-accent);
+      margin-bottom: var(--sp-4);
+      display: block;
+    }
+    .feature-block h3 {
+      font-size: clamp(var(--text-2xl), 3vw, var(--text-4xl));
+      font-weight: 800;
+      letter-spacing: -.025em;
+      color: var(--fg-strong);
+      line-height: 1.15;
+      margin-bottom: var(--sp-4);
+    }
+    .feature-block > div > p { font-size: var(--text-base); color: var(--fg-muted); line-height: 1.78; margin-bottom: var(--sp-6); }
+    .feat-list { list-style: none; display: flex; flex-direction: column; gap: var(--sp-3); }
+    .feat-list li {
+      display: flex; align-items: flex-start; gap: var(--sp-3);
+      font-size: var(--text-sm); color: var(--fg-muted); line-height: 1.6;
+    }
+    .feat-list li::before {
+      content: '';
+      width: 16px; height: 16px; min-width: 16px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='none' stroke='%232CA9E1' stroke-width='1.5'/%3E%3Cpath d='M5 8l2 2 4-4' stroke='%232CA9E1' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E") center/contain no-repeat;
+      margin-top: 2px;
+    }
+
+    /* ── UI MOCKUPS ────────────────────────────────────── */
+    .feature-ui {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: var(--sp-6);
+      box-shadow: var(--glow-blue), var(--shadow-lg);
+      backdrop-filter: blur(12px);
+      position: relative; overflow: hidden;
+    }
+    .feature-ui::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--grad-cool);
+    }
+    .ui-header {
+      display: flex; align-items: center; gap: var(--sp-2);
+      margin-bottom: var(--sp-5);
+    }
+    .ui-dots { display: flex; gap: 5px; }
+    .ui-dots span { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.12); }
+    .ui-dots span:nth-child(1) { background: #FF5F56; }
+    .ui-dots span:nth-child(2) { background: #FFBD2E; }
+    .ui-dots span:nth-child(3) { background: #27C93F; }
+    .ui-title { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-subtle); letter-spacing: .06em; }
+    .ui-row {
+      background: rgba(44,169,225,.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: var(--sp-3) var(--sp-4);
+      margin-bottom: var(--sp-2);
+    }
+    .ui-row-label { font-family: var(--font-mono); font-size: .65rem; font-weight: 500; text-transform: uppercase; letter-spacing: .1em; color: var(--fg-subtle); margin-bottom: 3px; }
+    .ui-row-val { font-size: var(--text-sm); color: var(--fg); font-weight: 500; line-height: 1.4; }
+    .ui-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: .65rem; font-weight: 500;
+      letter-spacing: .06em; text-transform: uppercase;
+      padding: 2px 8px; border-radius: 100px;
+      margin-top: 5px;
+    }
+    .ui-tag-blue   { background: rgba(44,169,225,.12); color: var(--ais-blue); border: 1px solid var(--border); }
+    .ui-tag-green  { background: rgba(39,201,63,.1);   color: #27C93F;        border: 1px solid rgba(39,201,63,.2); }
+    .ui-tag-orange { background: rgba(45,155,168,.1);  color: var(--ais-teal); border: 1px solid var(--border-teal); }
+    .ui-tag-red    { background: rgba(255,95,86,.1);   color: #FF7A72;        border: 1px solid rgba(255,95,86,.2); }
+    .ui-divider { height: 1px; background: var(--border); margin: var(--sp-4) 0; }
+    .ui-sub { font-family: var(--font-mono); font-size: .68rem; color: var(--fg-subtle); letter-spacing: .04em; }
+    .ui-bar { height: 4px; background: rgba(255,255,255,.06); border-radius: 2px; overflow: hidden; margin-top: 5px; }
+    .ui-bar-fill { height: 100%; border-radius: 2px; background: var(--grad-cool); }
+
+    /* ── SECURITY ──────────────────────────────────────── */
+    .security-section {
+      background: var(--bg-base);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      position: relative; overflow: hidden;
+    }
+    .security-section::before {
+      content: '';
+      position: absolute; bottom: 0; left: 0;
+      width: 600px; height: 600px;
+      background: radial-gradient(ellipse, rgba(44,169,225,.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .sec-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-16); align-items: center;
+    }
+    .sec-points { display: flex; flex-direction: column; gap: var(--sp-6); }
+    .sec-pt { display: flex; gap: var(--sp-4); align-items: flex-start; }
+    .sec-icon {
+      width: 44px; height: 44px; min-width: 44px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-glass);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .sec-icon svg { width: 20px; height: 20px; stroke: var(--ais-blue); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .sec-pt h4 { font-size: var(--text-base); font-weight: 700; color: var(--fg-strong); margin-bottom: 4px; }
+    .sec-pt p  { font-size: var(--text-sm); color: var(--fg-muted); line-height: 1.65; }
+    .sec-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--glow-blue), var(--shadow-lg);
+    }
+    .sec-panel-header {
+      padding: var(--sp-4) var(--sp-6);
+      background: rgba(44,169,225,.06);
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--fg-subtle);
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+    }
+    .sec-panel-header span:last-child { color: var(--fg-accent); }
+    .sec-row {
+      display: grid; grid-template-columns: 1.4fr 1fr 1fr;
+      padding: var(--sp-3) var(--sp-6);
+      border-bottom: 1px solid var(--border);
+      transition: background .2s;
+    }
+    .sec-row:last-child { border-bottom: none; }
+    .sec-row:hover { background: rgba(44,169,225,.03); }
+    .sec-row span { font-size: var(--text-sm); color: var(--fg-muted); display: flex; align-items: center; }
+    .sec-row span:first-child { color: var(--fg); font-weight: 500; }
+    .sec-bad  { color: rgba(255,95,86,.8)  !important; }
+    .sec-good { color: #27C93F !important; font-weight: 700 !important; }
+
+    /* ── HOW IT WORKS ──────────────────────────────────── */
+    .steps-row {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 0;
+      margin-top: var(--sp-12);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      overflow: hidden;
+    }
+    .step {
+      padding: var(--sp-8) var(--sp-6);
+      border-right: 1px solid var(--border);
+      text-align: center;
+    }
+    .step:last-child { border-right: none; }
+    .step-num {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      border: 2px solid var(--border-strong);
+      background: var(--bg-glass);
+      color: var(--fg-accent);
+      font-family: var(--font-mono);
+      font-size: var(--text-xl);
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto var(--sp-5);
+    }
+    .step h4 { font-size: var(--text-base); font-weight: 700; color: var(--fg-strong); margin-bottom: var(--sp-3); }
+    .step p  { font-size: var(--text-sm); color: var(--fg-muted); line-height: 1.65; }
+
+    /* ── TESTIMONIALS ──────────────────────────────────── */
+    .testi-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
+      gap: var(--sp-5); margin-top: var(--sp-12);
+    }
+    .testi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--sp-8);
+      backdrop-filter: blur(12px);
+      transition: border-color .25s, box-shadow .25s;
+    }
+    .testi-card:hover { border-color: var(--border-hover); box-shadow: var(--glow-blue); }
+    .testi-stars { display: flex; gap: 3px; margin-bottom: var(--sp-4); }
+    .testi-stars span { color: var(--ais-orange); font-size: var(--text-base); }
+    .testi-quote { font-size: var(--text-sm); color: var(--fg-muted); line-height: 1.75; margin-bottom: var(--sp-6); font-style: italic; }
+    .testi-author { display: flex; align-items: center; gap: var(--sp-3); }
+    .testi-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--grad-cool);
+      display: flex; align-items: center; justify-content: center;
+      font-size: var(--text-sm); font-weight: 700; color: white;
+      flex-shrink: 0;
+    }
+    .testi-author strong { display: block; font-size: var(--text-sm); font-weight: 700; color: var(--fg-strong); }
+    .testi-author span   { font-size: var(--text-xs); color: var(--fg-subtle); font-family: var(--font-mono); }
+
+    /* ── COMPARISON ────────────────────────────────────── */
+    .compare-wrap { overflow-x: auto; margin-top: var(--sp-12); }
+    .compare-table {
+      width: 100%; border-collapse: collapse;
+      border-radius: var(--radius-lg); overflow: hidden;
+      border: 1px solid var(--border); min-width: 640px;
+    }
+    .compare-table th {
+      padding: var(--sp-4) var(--sp-5);
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      background: rgba(44,169,225,.06);
+      color: var(--fg-subtle);
+      border-bottom: 1px solid var(--border);
+    }
+    .compare-table th:last-child { color: var(--fg-accent); }
+    .compare-table td {
+      padding: var(--sp-3) var(--sp-5);
+      font-size: var(--text-sm);
+      color: var(--fg-muted);
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .compare-table td:first-child { color: var(--fg); font-weight: 600; }
+    .compare-table td:last-child { color: var(--fg-accent); font-weight: 600; }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table tr:hover td { background: rgba(44,169,225,.03); }
+    .chk { color: #27C93F !important; font-weight: 700 !important; }
+    .x   { color: rgba(255,95,86,.7) !important; }
+
+    /* ── PRICING ───────────────────────────────────────── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px,1fr));
+      gap: var(--sp-5);
+      margin-top: var(--sp-12);
+    }
+    .pricing-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--sp-8);
+      backdrop-filter: blur(12px);
+      transition: border-color .25s, box-shadow .25s, transform .25s;
+      position: relative;
+    }
+    .pricing-card:hover { border-color: var(--border-hover); box-shadow: var(--glow-blue); transform: translateY(-4px); }
+    .pricing-card.featured {
+      border-color: var(--border-strong);
+      box-shadow: var(--glow-blue-intense), var(--shadow-lg);
+    }
+    .pricing-card.featured::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--grad-cool);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+    .pricing-badge {
+      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 500;
+      letter-spacing: .1em; text-transform: uppercase;
+      padding: 4px 14px; border-radius: 100px;
+      background: var(--grad-cool); color: #fff;
+      white-space: nowrap;
+    }
+    .pricing-card h3 { font-size: var(--text-base); font-weight: 700; color: var(--fg-subtle); margin-bottom: var(--sp-3); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: .1em; }
+    .pricing-price { font-size: 3rem; font-weight: 900; letter-spacing: -.04em; color: var(--fg-strong); line-height: 1; margin-bottom: 4px; }
+    .pricing-price .dollar { font-size: 1.5rem; vertical-align: top; margin-top: .4rem; display: inline-block; color: var(--fg-muted); }
+    .pricing-price.custom { font-size: var(--text-2xl); color: var(--fg-accent); }
+    .pricing-period { font-size: var(--text-xs); color: var(--fg-subtle); font-family: var(--font-mono); letter-spacing: .06em; margin-bottom: var(--sp-5); }
+    .pricing-desc { font-size: var(--text-sm); color: var(--fg-muted); line-height: 1.65; margin-bottom: var(--sp-6); }
+    .pricing-divider { height: 1px; background: var(--border); margin-bottom: var(--sp-6); }
+    .pricing-features { list-style: none; display: flex; flex-direction: column; gap: var(--sp-3); margin-bottom: var(--sp-8); }
+    .pricing-features li { display: flex; align-items: flex-start; gap: var(--sp-3); font-size: var(--text-sm); color: var(--fg-muted); }
+    .pricing-features li::before {
+      content: '';
+      width: 16px; height: 16px; min-width: 16px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='none' stroke='%232CA9E1' stroke-width='1.5'/%3E%3Cpath d='M5 8l2 2 4-4' stroke='%232CA9E1' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E") center/contain no-repeat;
+      margin-top: 1px;
+    }
+    .pricing-btn {
+      display: block; width: 100%; text-align: center;
+      padding: var(--sp-3) var(--sp-6);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-sans); font-weight: 700; font-size: var(--text-sm);
+      letter-spacing: .04em; text-transform: uppercase;
+      transition: all .2s;
+    }
+    .pricing-btn-orange {
+      background: var(--grad-cool); color: #fff;
+      box-shadow: var(--glow-blue);
+    }
+    .pricing-btn-orange:hover { transform: translateY(-1px); box-shadow: var(--glow-blue-intense); }
+    .pricing-btn-ghost {
+      background: transparent; color: var(--fg-muted);
+      border: 1px solid var(--border);
+    }
+    .pricing-btn-ghost:hover { border-color: var(--border-hover); color: var(--fg); }
+
+    /* ── CTA SECTION ───────────────────────────────────── */
+    .cta-section {
+      position: relative; overflow: hidden;
+      text-align: center;
+    }
+    .cta-glow {
+      position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 500px;
+      background: radial-gradient(ellipse, rgba(44,169,225,.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-section h2 {
+      font-size: clamp(var(--text-3xl), 5vw, var(--text-5xl));
+      font-weight: 900; letter-spacing: -.03em;
+      color: var(--fg-strong); max-width: 740px;
+      margin: 0 auto var(--sp-5); line-height: 1.1; position: relative;
+    }
+    .cta-section > p { font-size: var(--text-lg); color: var(--fg-muted); max-width: 480px; margin: 0 auto var(--sp-10); line-height: 1.72; position: relative; }
+    .demo-form {
+      display: flex; gap: var(--sp-3); justify-content: center;
+      max-width: 480px; margin: 0 auto; flex-wrap: wrap; position: relative;
+    }
+    .demo-form input {
+      flex: 1; min-width: 220px;
+      padding: var(--sp-3) var(--sp-4);
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      color: var(--fg); font-family: var(--font-sans); font-size: var(--text-sm);
+      outline: none; transition: border-color .2s, box-shadow .2s;
+    }
+    .demo-form input::placeholder { color: var(--fg-subtle); }
+    .demo-form input:focus { border-color: var(--border-strongest); box-shadow: 0 0 0 3px rgba(44,169,225,.12); }
+    #form-success { display: none; font-size: var(--text-base); color: var(--fg-accent); font-weight: 600; margin-top: var(--sp-5); position: relative; font-family: var(--font-mono); }
+
+    /* ── FOOTER ────────────────────────────────────────── */
+    footer {
+      background: var(--bg-base);
+      border-top: 1px solid var(--border);
+      padding: var(--sp-12) 0;
+    }
+    .footer-inner {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--sp-5);
+    }
+    footer img { height: 28px; filter: brightness(0) invert(1); opacity: .5; }
+    .footer-links { display: flex; gap: var(--sp-8); list-style: none; }
+    .footer-links a { font-size: var(--text-sm); color: var(--fg-subtle); transition: color .2s; }
+    .footer-links a:hover { color: var(--fg-accent); }
+    .footer-copy { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-subtle); letter-spacing: .04em; }
+
+    /* ── ABOUT ─────────────────────────────────────────── */
+    .founders-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: var(--sp-5);
+      margin-top: var(--sp-12);
+    }
+    .founder-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--sp-8);
+      backdrop-filter: blur(12px);
+      transition: border-color .25s, box-shadow .25s, transform .25s;
+    }
+    .founder-card:hover {
+      border-color: var(--border-hover);
+      box-shadow: var(--glow-blue), var(--shadow-md);
+      transform: translateY(-3px);
+    }
+    .founder-avatar {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--grad-cool);
+      display: flex; align-items: center; justify-content: center;
+      font-size: var(--text-lg); font-weight: 800; color: white;
+      margin-bottom: var(--sp-5);
+      box-shadow: 0 0 24px rgba(44,169,225,.25);
+    }
+    .founder-card h3 { font-size: var(--text-lg); font-weight: 700; color: var(--fg-strong); margin-bottom: 4px; }
+    .founder-role {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--fg-accent);
+      margin-bottom: var(--sp-4);
+    }
+    .founder-card p { font-size: var(--text-sm); color: var(--fg-muted); line-height: 1.72; }
+    .about-origin {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-16);
+      align-items: center;
+      margin-bottom: var(--sp-16);
+    }
+    .about-origin p { font-size: var(--text-base); color: var(--fg-muted); line-height: 1.8; }
+    .about-origin p + p { margin-top: var(--sp-4); }
+    .about-quote {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-left: 3px solid var(--ais-blue);
+      border-radius: var(--radius);
+      padding: var(--sp-8);
+      position: relative;
+    }
+    .about-quote::before {
+      content: '\201C';
+      position: absolute; top: var(--sp-4); left: var(--sp-5);
+      font-size: 4rem; font-weight: 900; line-height: 1;
+      color: rgba(44,169,225,.2);
+      font-family: Georgia, serif;
+    }
+    .about-quote blockquote {
+      font-size: var(--text-lg);
+      font-style: italic;
+      color: var(--fg);
+      line-height: 1.72;
+      padding-top: var(--sp-6);
+    }
+    .about-quote cite {
+      display: block;
+      margin-top: var(--sp-5);
+      font-size: var(--text-sm);
+      font-style: normal;
+      font-family: var(--font-mono);
+      color: var(--fg-accent);
+      letter-spacing: .05em;
+    }
+    @media (max-width: 900px) {
+      .about-origin { grid-template-columns: 1fr; gap: var(--sp-8); }
+    }
+
+    /* ── ETHEREAL SHADOW ───────────────────────────────── */
+    .hero-ethereal {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .hero-ethereal-inner {
+      position: absolute;
+      inset: -100px;
+      filter: url(#ethereal-filter) blur(4px);
+    }
+    .hero-ethereal-color {
+      background: linear-gradient(135deg, rgba(44,169,225,.95) 0%, rgba(45,155,168,.85) 100%);
+      -webkit-mask-image: url('https://framerusercontent.com/images/ceBGguIpUU8luwByxuQz79t7To.png');
+      mask-image: url('https://framerusercontent.com/images/ceBGguIpUU8luwByxuQz79t7To.png');
+      -webkit-mask-size: cover;
+      mask-size: cover;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
+      width: 100%;
+      height: 100%;
+    }
+    .hero-ethereal-noise {
+      position: absolute;
+      inset: 0;
+      background-image: url("https://framerusercontent.com/images/g0QcWrxr87K0ufOxIUFBakwYA8.png");
+      background-size: 240px;
+      background-repeat: repeat;
+      opacity: 0.18;
+      mix-blend-mode: overlay;
+    }
+
+    /* ── LAMP ──────────────────────────────────────────── */
+    .hero-lamp {
+      position: absolute; inset: 0;
+      overflow: hidden; pointer-events: none;
+    }
+    .hero-lamp-scene {
+      position: absolute; inset: 0;
+    }
+    /* Beams anchor at the very top of the hero and fan downward */
+    .hero-lamp-beam {
+      position: absolute; top: 0;
+      height: 340px; overflow: visible;
+      animation: lamp-beam-in .8s .3s ease-in-out both;
+    }
+    .hero-lamp-beam-l {
+      right: 50%; width: 480px;
+      background: conic-gradient(from 70deg at center top, rgba(44,169,225,.45), transparent, transparent);
+    }
+    .hero-lamp-beam-l::before {
+      content: ''; position: absolute;
+      top: 0; bottom: 0; left: 0; width: 160px;
+      background: linear-gradient(to right, var(--bg-page), transparent);
+    }
+    .hero-lamp-beam-l::after {
+      content: ''; position: absolute;
+      left: 0; right: 0; bottom: 0; height: 180px;
+      background: linear-gradient(to top, var(--bg-page), transparent);
+    }
+    .hero-lamp-beam-r {
+      left: 50%; width: 480px;
+      background: conic-gradient(from 290deg at center top, transparent, transparent, rgba(44,169,225,.45));
+    }
+    .hero-lamp-beam-r::before {
+      content: ''; position: absolute;
+      top: 0; bottom: 0; right: 0; width: 160px;
+      background: linear-gradient(to left, var(--bg-page), transparent);
+    }
+    .hero-lamp-beam-r::after {
+      content: ''; position: absolute;
+      left: 0; right: 0; bottom: 0; height: 180px;
+      background: linear-gradient(to top, var(--bg-page), transparent);
+    }
+    @keyframes lamp-beam-in {
+      from { opacity: .5; width: 240px; }
+      to   { opacity: 1;  width: 480px; }
+    }
+    /* Glow centered on the lamp line (top: 0) — negative top is clipped but blur bleeds in */
+    .hero-lamp-glow {
+      position: absolute; z-index: 50;
+      top: -72px; left: 50%; transform: translateX(-50%);
+      height: 144px; width: 448px;
+      border-radius: 9999px;
+      background: var(--ais-blue); opacity: .5; filter: blur(48px);
+    }
+    .hero-lamp-hot {
+      position: absolute; z-index: 30;
+      top: -72px; left: 50%; transform: translateX(-50%);
+      height: 144px; border-radius: 9999px;
+      background: var(--ais-blue); filter: blur(32px);
+      animation: lamp-hot-in .8s .3s ease-in-out both;
+    }
+    @keyframes lamp-hot-in {
+      from { width: 128px; }
+      to   { width: 256px; }
+    }
+    /* The lamp line sits at the very top edge of the hero */
+    .hero-lamp-line {
+      position: absolute; z-index: 50;
+      top: 0; left: 50%; transform: translateX(-50%);
+      height: 2px;
+      background: var(--ais-blue);
+      box-shadow: 0 0 16px var(--ais-blue), 0 0 30px rgba(44,169,225,.4);
+      animation: lamp-line-in .8s .3s ease-in-out both;
+    }
+    @keyframes lamp-line-in {
+      from { width: 240px; }
+      to   { width: 480px; }
+    }
+    /* Soft fade at the bottom of the beam area */
+    .hero-lamp-blur-bot {
+      position: absolute;
+      top: 300px; height: 100px; width: 100%;
+      background: linear-gradient(to bottom, transparent, var(--bg-page));
+      z-index: 2;
+    }
+    .hero-lamp-backdrop { display: none; }
+    .hero-lamp-cover    { display: none; }
+    .hero > .container  { position: relative; z-index: 50; }
+
+    /* ── TRUST BAR ─────────────────────────────────────── */
+    .trust-bar {
+      display: flex; justify-content: center; align-items: center;
+      gap: var(--sp-6); flex-wrap: wrap;
+      margin-top: var(--sp-8);
+      padding-top: var(--sp-6);
+      border-top: 1px solid var(--border);
+    }
+    .trust-item {
+      display: flex; align-items: center; gap: var(--sp-2);
+      font-size: var(--text-xs); color: var(--fg-subtle);
+      font-family: var(--font-mono); letter-spacing: .06em;
+      white-space: nowrap;
+    }
+    .trust-item svg {
+      width: 14px; height: 14px; flex-shrink: 0;
+      stroke: var(--ais-teal); fill: none; stroke-width: 2;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    /* ── TESTIMONIALS ───────────────────────────────────── */
+    .testi-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
+      gap: var(--sp-5); margin-top: var(--sp-12);
+    }
+    .testi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--sp-8);
+      backdrop-filter: blur(12px);
+      transition: border-color .25s, box-shadow .25s;
+    }
+    .testi-card:hover { border-color: var(--border-hover); box-shadow: var(--glow-blue); }
+    .testi-quote {
+      font-size: var(--text-sm); color: var(--fg-muted);
+      line-height: 1.8; margin-bottom: var(--sp-6);
+      font-style: italic;
+      padding-left: var(--sp-4);
+      border-left: 2px solid var(--border-teal-strong);
+    }
+    .testi-author { display: flex; align-items: center; gap: var(--sp-3); }
+    .testi-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--grad-cool);
+      display: flex; align-items: center; justify-content: center;
+      font-size: var(--text-sm); font-weight: 700; color: white; flex-shrink: 0;
+    }
+    .testi-author strong { display: block; font-size: var(--text-sm); font-weight: 700; color: var(--fg-strong); }
+    .testi-author span   { font-size: var(--text-xs); color: var(--fg-subtle); font-family: var(--font-mono); }
+
+    /* ── FOOTER REDESIGN ────────────────────────────────── */
+    .footer-top {
+      display: grid; grid-template-columns: 1fr 2fr;
+      gap: var(--sp-16); padding-bottom: var(--sp-10);
+      border-bottom: 1px solid var(--border);
+    }
+    .footer-brand img { height: 28px; filter: brightness(0) invert(1); opacity: .5; margin-bottom: var(--sp-4); }
+    .footer-tagline { font-size: var(--text-sm); color: var(--fg-subtle); line-height: 1.7; max-width: 280px; }
+    .footer-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-8); }
+    .footer-col-head {
+      font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 500;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--fg-muted); margin-bottom: var(--sp-4);
+    }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: var(--sp-3); }
+    .footer-links a { font-size: var(--text-sm); color: var(--fg-subtle); transition: color .2s; }
+    .footer-links a:hover { color: var(--fg-accent); }
+    .footer-links li { font-size: var(--text-sm); color: var(--fg-subtle); }
+    .footer-bottom {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: var(--sp-4); padding-top: var(--sp-8);
+    }
+    .footer-copy { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-subtle); letter-spacing: .04em; }
+    .footer-compliance { display: flex; gap: var(--sp-3); flex-wrap: wrap; }
+    .footer-badge {
+      font-family: var(--font-mono); font-size: .65rem; font-weight: 500;
+      letter-spacing: .08em; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 100px;
+      border: 1px solid var(--border); color: var(--fg-subtle);
+    }
+    @media (max-width: 768px) {
+      .footer-top { grid-template-columns: 1fr; gap: var(--sp-8); }
+      .footer-cols { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ── FADE ANIMATIONS ───────────────────────────────── */
+    .fade-up { opacity: 0; transform: translateY(24px); transition: opacity .65s ease, transform .65s ease; }
+    .fade-up.visible { opacity: 1; transform: none; }
+
+    /* ── RESPONSIVE ────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .feature-block, .feature-block.reverse, .sec-grid { grid-template-columns: 1fr; }
+      .feature-block.reverse .feature-ui { order: 0; }
+      .steps-row { grid-template-columns: 1fr; }
+      .step { border-right: none; border-bottom: 1px solid var(--border); }
+      .step:last-child { border-bottom: none; }
+      .nav-links li:not(:last-child):not(:nth-last-child(2)) { display: none; }
+    }
+    @media (max-width: 600px) {
+      .hero-stat { min-width: 140px; padding: var(--sp-4); }
+      .demo-form { flex-direction: column; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ───────────────────────────────────────────────── -->
+<nav>
+  <div class="container">
+    <div class="nav-inner">
+      <a href="#"><img src="brand_assets/aikur_logo.png" alt="Aikuir" style="height:34px;width:auto;" /></a>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#security">Security</a></li>
+        <li><a href="#about">About</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="mailto:hello@aikuir.com" class="btn btn-ghost">Contact Us</a>
+        <a href="#demo" class="btn btn-orange btn-neon">Schedule Demo</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ──────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-lamp" aria-hidden="true">
+    <div class="hero-lamp-scene">
+      <div class="hero-lamp-beam hero-lamp-beam-l"></div>
+      <div class="hero-lamp-beam hero-lamp-beam-r"></div>
+      <div class="hero-lamp-glow"></div>
+      <div class="hero-lamp-hot"></div>
+      <div class="hero-lamp-line"></div>
+      <div class="hero-lamp-blur-bot"></div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="hero-eyebrow">
+      <span class="badge">Purpose-Built for Workers' Compensation</span>
+    </div>
+    <h1>
+      Saving Your WC Practice<br/>Hours Safely.
+    </h1>
+    <p class="hero-sub">Aikuir automates the work that eats your day, saving <strong style="color:var(--ais-blue);font-weight:700;">hours per case</strong> while keeping every byte of client data inside your office. <strong style="color:var(--ais-teal);font-weight:700;">Zero cloud exposure. Ever.</strong></p>
+    <div class="hero-cta">
+      <a href="#demo" class="btn btn-orange btn-neon">Schedule a Demo</a>
+      <a href="#features" class="btn btn-blue">Explore the Platform</a>
+    </div>
+    <div class="trust-bar fade-up">
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        HIPAA-Compliant Architecture
+      </div>
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        Zero Cloud Exposure
+      </div>
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24"><path d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>
+        Bar Advertising Compliant
+      </div>
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+        Founded by a WC Attorney
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="hairline" />
+
+<!-- ── PROBLEM ───────────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">The Problem</div>
+      <h2 class="section-title">Four problems.<br/><span class="accent">No existing tool solves all of them.</span></h2>
+      <p class="section-sub">WC attorneys are forced to stitch together expensive, disconnected tools — none of which were built for this practice area.</p>
+    </div>
+    <div class="problem-grid">
+      <div class="card fade-up">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </div>
+        <h3>Medical Records Are a Manual Bottleneck</h3>
+        <p>Paralegals manually sort records from mail, email, and WC-102 packets — consuming hours per case with no automation in the pipeline.</p>
+      </div>
+      <div class="card fade-up">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <h3>AI Drafting Is an Expensive Add-On</h3>
+        <p>Platforms like Filevine charge ~$300 per case for AI features. Across a full caseload, costs compound fast — especially for smaller firms.</p>
+      </div>
+      <div class="card fade-up">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
+        </div>
+        <h3>Marketing Is Expensive and Untracked</h3>
+        <p>A typical WC firm spends $150K+ annually on SEO and ads with no visibility into which channels actually generate cases.</p>
+      </div>
+      <div class="card fade-up">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        </div>
+        <h3>Cloud Platforms Are a Liability</h3>
+        <p>Every major legal platform stores client data in the cloud — exposed to ransomware, breaches, and outages you can't control. One incident means Bar discipline and client harm.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="hairline" />
+
+<!-- ── FEATURES OVERVIEW ──────────────────────────────────── -->
+<section class="section features-overview" id="features">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">The Platform</div>
+      <h2 class="section-title">Everything your WC practice needs.<br/><span class="accent">Nothing you don't.</span></h2>
+      <p class="section-sub">Four tightly integrated modules, designed from the ground up by a practicing workers' compensation attorney.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="card fade-up">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </div>
+        <h3>Medical Record Automation</h3>
+        <p>Ingest, classify, and summarize every record automatically. Get a hyperlinked clinical timeline ready for demand drafting in minutes, not days.</p>
+      </div>
+      <div class="card fade-up">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+        </div>
+        <h3>AI Drafting & Litigation</h3>
+        <p>Generate demand letters, discovery responses, and deposition outlines grounded in your actual case data. No per-case fees — ever.</p>
+      </div>
+      <div class="card fade-up">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
+        </div>
+        <h3>Marketing Automation</h3>
+        <p>Turn your case database into a content engine. Automated LinkedIn and Instagram posts, lead tracking, and zero SEO agency fees.</p>
+      </div>
+      <div class="card fade-up">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg>
+        </div>
+        <h3>Local Server — The Black Box</h3>
+        <p>Plug-and-play on-premises hardware. All data stays within your office walls. No cloud dependency, no breach risk, HIPAA-compliant by design.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="hairline" />
+
+<!-- ── DEEP FEATURES ──────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+
+    <!-- Medical Records -->
+    <div class="feature-block fade-up">
+      <div>
+        <span class="feat-tag">// Medical Record Automation</span>
+        <h3>Your paralegal spends hours sorting records per case.<br/><span style="color:var(--ais-blue);">Aikuir does it in minutes.</span></h3>
+        <p>Every WC case arrives with a flood of records — scanned mail, email attachments, WC-102 packets from opposing counsel. Sorting, classifying, and summarizing them manually is the single biggest time drain in a WC practice. Aikuir eliminates it entirely.</p>
+        <ul class="feat-list">
+          <li>Ingests records from any source: scanned mail, email, WC-102 packets</li>
+          <li>AI classifies every document — medical record, Board form, IME, wage docs</li>
+          <li>Extracts and structures each visit: diagnosis, body parts, treatment, work restrictions</li>
+          <li>Generates a chronological timeline with hyperlinks to every source document</li>
+          <li>Output is ready for demand drafting, deposition prep, or case strategy — immediately</li>
+        </ul>
+        <div style="margin-top:var(--sp-8);display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);">
+          <div style="background:rgba(255,80,80,.06);border:1px solid rgba(255,80,80,.15);border-radius:var(--radius);padding:var(--sp-5);">
+            <div style="font-family:var(--font-mono);font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.1em;color:rgba(255,120,120,.7);margin-bottom:var(--sp-2);">Without Aikuir</div>
+            <div style="font-size:2rem;font-weight:900;color:#FF8080;letter-spacing:-.03em;line-height:1;">Hours</div>
+            <div style="font-size:var(--text-xs);color:var(--fg-subtle);margin-top:4px;">per case, manual paralegal work</div>
+          </div>
+          <div style="background:rgba(44,169,225,.06);border:1px solid var(--border-strong);border-radius:var(--radius);padding:var(--sp-5);">
+            <div style="font-family:var(--font-mono);font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.1em;color:var(--fg-accent);margin-bottom:var(--sp-2);">With Aikuir</div>
+            <div style="font-size:2rem;font-weight:900;color:var(--ais-blue);letter-spacing:-.03em;line-height:1;text-shadow:0 0 20px rgba(44,169,225,.4);">&lt; 10 min</div>
+            <div style="font-size:var(--text-xs);color:var(--fg-subtle);margin-top:4px;">fully automated, zero manual sorting</div>
+          </div>
+        </div>
+      </div>
+      <div class="feature-ui">
+        <div class="ui-header">
+          <div class="ui-dots"><span></span><span></span><span></span></div>
+          <span class="ui-title">record-timeline — smith-v-employer.aikuir</span>
+        </div>
+        <div style="font-family:var(--font-mono);font-size:.65rem;color:var(--fg-subtle);margin-bottom:var(--sp-3);display:flex;align-items:center;gap:var(--sp-2);">
+          <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#27C93F;box-shadow:0 0 6px #27C93F;"></span>
+          Processing 24 records — auto-classifying &amp; summarizing
+        </div>
+        <div class="ui-row">
+          <div class="ui-row-label">03/12/2025 · Atlanta Orthopedics</div>
+          <div class="ui-row-val">Lumbar strain L4-L5 · PT ordered · No heavy lifting</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <span class="ui-tag ui-tag-red">Work Restricted</span>
+            <span class="ui-tag ui-tag-green">Summarized</span>
+          </div>
+        </div>
+        <div class="ui-row">
+          <div class="ui-row-label">04/02/2025 · WC-102 Board Form</div>
+          <div class="ui-row-val">Modified duty offer acknowledged by employer</div>
+          <span class="ui-tag ui-tag-orange">Board Form</span>
+        </div>
+        <div class="ui-row">
+          <div class="ui-row-label">04/18/2025 · IME Report</div>
+          <div class="ui-row-val">12% PPD — shoulder impingement confirmed</div>
+          <span class="ui-tag ui-tag-blue">IME · Source linked</span>
+        </div>
+        <div class="ui-divider"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span class="ui-sub">24 records processed · timeline.docx ready</span>
+          <span class="ui-tag ui-tag-green" style="font-size:.65rem;">Hours saved</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Marketing -->
+    <div class="feature-block fade-up">
+      <div>
+        <span class="feat-tag">// Marketing Automation</span>
+        <h3>Your track record, marketed automatically.</h3>
+        <p>Aikuir converts your case database into a continuous content engine. The more cases you handle, the more powerful your marketing becomes — with zero agency fees and full Bar compliance built in.</p>
+        <ul class="feat-list">
+          <li>Automated Instagram settlement posts when cases close above your threshold</li>
+          <li>LinkedIn articles generated from your active and closed case data</li>
+          <li>Lead source analytics — see which channels actually generate cases</li>
+          <li>All content anonymized and Bar advertising-compliant by default</li>
+          <li>Replace $150K+ in annual agency spend with one integrated tool</li>
+        </ul>
+      </div>
+      <div class="feature-ui">
+        <div class="ui-header">
+          <div class="ui-dots"><span></span><span></span><span></span></div>
+          <span class="ui-title">marketing-dashboard.aikuir</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
+          <div style="background:rgba(44,169,225,.06);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center;">
+            <div style="font-size:1.5rem;font-weight:900;color:var(--ais-blue);line-height:1;text-shadow:0 0 16px rgba(44,169,225,.4);">47</div>
+            <div style="font-size:.63rem;color:var(--fg-subtle);text-transform:uppercase;letter-spacing:.07em;margin-top:4px;font-family:var(--font-mono);">Posts Live</div>
+          </div>
+          <div style="background:rgba(45,155,168,.06);border:1px solid var(--border-teal);border-radius:var(--radius-sm);padding:12px;text-align:center;">
+            <div style="font-size:1.5rem;font-weight:900;color:var(--ais-teal);line-height:1;text-shadow:0 0 16px rgba(45,155,168,.5);">$0</div>
+            <div style="font-size:.63rem;color:var(--fg-subtle);text-transform:uppercase;letter-spacing:.07em;margin-top:4px;font-family:var(--font-mono);">Agency Cost</div>
+          </div>
+          <div style="background:rgba(39,201,63,.06);border:1px solid rgba(39,201,63,.2);border-radius:var(--radius-sm);padding:12px;text-align:center;">
+            <div style="font-size:1.5rem;font-weight:900;color:#27C93F;line-height:1;text-shadow:0 0 16px rgba(39,201,63,.4);">12</div>
+            <div style="font-size:.63rem;color:var(--fg-subtle);text-transform:uppercase;letter-spacing:.07em;margin-top:4px;font-family:var(--font-mono);">New Leads</div>
+          </div>
+        </div>
+        <div class="ui-row">
+          <div class="ui-row-label">Lead Source Breakdown · This Month</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--fg-muted);margin-bottom:4px;font-family:var(--font-mono);"><span>LinkedIn (Organic)</span><span style="color:var(--ais-blue);">51%</span></div>
+              <div class="ui-bar"><div class="ui-bar-fill" style="width:51%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--fg-muted);margin-bottom:4px;font-family:var(--font-mono);"><span>Referral</span><span style="color:#27C93F;">29%</span></div>
+              <div class="ui-bar"><div class="ui-bar-fill" style="width:29%;background:linear-gradient(90deg,#27C93F,#4DB86A)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--fg-muted);margin-bottom:4px;font-family:var(--font-mono);"><span>Instagram</span><span style="color:var(--ais-teal);">20%</span></div>
+              <div class="ui-bar"><div class="ui-bar-fill" style="width:20%;background:var(--grad-teal)"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="hairline" />
+
+<!-- ── HOW IT WORKS ───────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+    <div class="fade-up" style="text-align:center;max-width:600px;margin:0 auto;">
+      <div class="section-label">Getting Started</div>
+      <h2 class="section-title" style="max-width:100%;">Up and running<br/><span class="accent">in three steps.</span></h2>
+      <p class="section-sub" style="margin:var(--sp-4) auto 0;max-width:100%;">Aikuir ships preconfigured. No IT staff required. No cloud migration. No disruption to your existing workflow.</p>
+    </div>
+    <div class="steps-row fade-up">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h4>Plug In Your Server</h4>
+        <p>Your Aikuir appliance arrives preconfigured. Connect it to your office network and power it on — it self-configures in minutes.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h4>Connect Your Workflow</h4>
+        <p>Link email for record ingestion, configure case thresholds, and connect your social accounts. Aikuir guides you through every step.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h4>Work Smarter Immediately</h4>
+        <p>Upload records from day one. Medical timelines, draft documents, and marketing posts begin generating the moment cases are entered.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="hairline" />
+
+<!-- ── SECURITY ───────────────────────────────────────────── -->
+<section class="section security-section" id="security">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">Security Architecture</div>
+      <h2 class="section-title">No cloud. No exposure.<br/><span class="accent">No exceptions.</span></h2>
+      <p class="section-sub">Every other legal AI platform stores your client data on servers you don't control. Aikuir doesn't. Your data never leaves your walls.</p>
+    </div>
+    <div class="sec-grid fade-up">
+      <div class="sec-points">
+        <div class="sec-pt">
+          <div class="sec-icon"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></div>
+          <div>
+            <h4>HIPAA-Compliant by Architecture</h4>
+            <p>All PHI is stored locally, encrypted at rest and in transit. Full audit logging of every record access. Compliance isn't a certification — it's the design.</p>
+          </div>
+        </div>
+        <div class="sec-pt">
+          <div class="sec-icon"><svg viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg></div>
+          <div>
+            <h4>No External Attack Surface</h4>
+            <p>The server is not internet-accessible. Ransomware, breaches, and third-party compromises cannot reach your client data — physically or architecturally.</p>
+          </div>
+        </div>
+        <div class="sec-pt">
+          <div class="sec-icon"><svg viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+          <div>
+            <h4>Role-Based Access Control</h4>
+            <p>Attorneys, paralegals, and admins each see exactly what they need. Granular permissions protect sensitive data at every level.</p>
+          </div>
+        </div>
+        <div class="sec-pt">
+          <div class="sec-icon"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div>
+          <div>
+            <h4>Bar Advertising Compliance Built In</h4>
+            <p>Auto-generated disclaimers on all marketing content. Client anonymization is on by default. Every post is Bar-compliant before it publishes.</p>
+          </div>
+        </div>
+      </div>
+      <div class="sec-panel">
+        <div class="sec-panel-header">
+          <span>Capability</span>
+          <span>Cloud Platforms</span>
+          <span>Aikuir</span>
+        </div>
+        <div class="sec-row"><span>Data storage location</span><span class="sec-bad">Remote server</span><span class="sec-good">Your office</span></div>
+        <div class="sec-row"><span>Ransomware exposure</span><span class="sec-bad">High</span><span class="sec-good">Eliminated</span></div>
+        <div class="sec-row"><span>Third-party breach risk</span><span class="sec-bad">Always present</span><span class="sec-good">Not possible</span></div>
+        <div class="sec-row"><span>HIPAA compliance model</span><span style="color:var(--fg-subtle);">Certified only</span><span class="sec-good">Architectural</span></div>
+        <div class="sec-row"><span>Internet-accessible</span><span class="sec-bad">Yes</span><span class="sec-good">No</span></div>
+        <div class="sec-row"><span>Data leaves your firm</span><span class="sec-bad">Always</span><span class="sec-good">Never</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="hairline" />
+
+<!-- ── TESTIMONIALS ───────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+    <div class="fade-up" style="text-align:center;max-width:600px;margin:0 auto;">
+      <div class="section-label">Early Access Feedback</div>
+      <h2 class="section-title" style="max-width:100%;">What WC attorneys<br/><span class="accent">are saying.</span></h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card fade-up">
+        <p class="testi-quote">"Before Aikuir, my paralegal spent a full day on records every time a new case came in. Now it's done before she finishes her coffee. The timeline it produces is more thorough than what we were creating manually."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">MP</div>
+          <div>
+            <strong>M. Patterson</strong>
+            <span>Workers' Compensation Attorney · Atlanta, GA</span>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card fade-up">
+        <p class="testi-quote">"I was paying $7,500 a month to an SEO agency that couldn't show me a single case it generated. Aikuir's marketing module told me in the first week. I cancelled the agency. That alone paid for years of this platform."</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:var(--grad-teal);">JR</div>
+          <div>
+            <strong>J. Rosenberg</strong>
+            <span>WC Firm Principal · Marietta, GA</span>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card fade-up">
+        <p class="testi-quote">"The on-premises setup was the only reason I agreed to try it. I won't put client PHI in anyone's cloud — full stop. This runs in my office like it should. No exceptions, no carve-outs, no 'we're SOC 2 certified so trust us.'"</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#4A90C0,#143C5A);">DK</div>
+          <div>
+            <strong>D. Kowalski</strong>
+            <span>Workers' Compensation Attorney · Augusta, GA</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="hairline" />
+
+<!-- ── ABOUT ──────────────────────────────────────────────── -->
+<section class="section" id="about">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">Our Story</div>
+      <h2 class="section-title">Built by a WC attorney<br/><span class="accent">who felt every one of these problems.</span></h2>
+    </div>
+    <div class="fade-up">
+      <p class="section-sub" style="max-width:720px;">Aikuir was built by a workers' compensation attorney who wanted to safely save hours managing medical records — without paying the enormous fees that every other platform charges to do it.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="hairline" />
+
+<!-- ── CTA ────────────────────────────────────────────────── -->
+<section class="section cta-section" id="demo">
+  <div class="cta-glow"></div>
+  <div class="container">
+    <h2>See Aikuir in action<br/><span style="color:var(--ais-blue);">with your own cases.</span></h2>
+    <p>Schedule a live demo and we'll walk through every module using a real WC case workflow — no sales pitch, just the product.</p>
+    <form class="demo-form" onsubmit="handleSubmit(event)">
+      <input type="email" placeholder="your@firm.com" required />
+      <button type="submit" class="btn btn-orange btn-neon">Schedule Demo</button>
+    </form>
+    <p id="form-success">We'll reach out within one business day to schedule your demo.</p>
+  </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────────── -->
+<footer>
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="brand_assets/aikur_logo.png" alt="Aikuir" />
+        <p class="footer-tagline">AI-powered legal operations for workers' compensation attorneys. Built by a WC attorney. Deployed on-premises — your office, your data, your control.</p>
+      </div>
+      <div class="footer-cols">
+        <div>
+          <div class="footer-col-head">Platform</div>
+          <ul class="footer-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#security">Security</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#demo">Schedule Demo</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-head">Legal</div>
+          <ul class="footer-links">
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">BAA Available on Request</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-head">Contact</div>
+          <ul class="footer-links">
+            <li><a href="mailto:hello@aikuir.com">hello@aikuir.com</a></li>
+            <li>Atlanta, Georgia</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2026 Aikuir, LLC. All rights reserved. Aikuir is not a law firm and does not provide legal advice.</p>
+      <div class="footer-compliance">
+        <span class="footer-badge">HIPAA Architecture</span>
+        <span class="footer-badge">Bar Compliant</span>
+        <span class="footer-badge">On-Premises Only</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -32px 0px' });
+
+  document.querySelectorAll('.fade-up').forEach((el, i) => {
+    observer.observe(el);
+  });
+
+  // Stagger grids
+  ['problem-grid','feat-grid'].forEach(cls => {
+    document.querySelector('.' + cls)?.querySelectorAll('.fade-up').forEach((el, i) => {
+      el.style.transitionDelay = `${i * 80}ms`;
+    });
+  });
+
+function handleSubmit(e) {
+    e.preventDefault();
+    e.target.style.display = 'none';
+    document.getElementById('form-success').style.display = 'block';
+  }
+</script>
+</body>
+</html>
